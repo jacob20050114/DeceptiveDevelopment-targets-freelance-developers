@@ -1,0 +1,35 @@
+# LaTeX 編譯產生的中間檔案
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.lof
+*.lot
+*.idx
+*.ind
+*.ilg
+*.glg
+*.glo
+*.gls
+*.acn
+*.acr
+*.alg
+
+# 編譯輸出（看你要不要追蹤 PDF）
+*.pdf
+
+# minted 套件的快取資料夾
+_minted*/
+
+# 其他編輯器暫存
+*.swp
+.DS_Store
