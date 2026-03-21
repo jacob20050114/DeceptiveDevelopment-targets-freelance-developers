@@ -34,7 +34,7 @@
 }
 
 \title{DeceptiveDevelopment 攻擊活動分析報告}
-\subtitle{從假招募到加密貨幣竊取的完整攻擊鏈}
+\subtitle{從假招募到 Cryptocurrency 竊取的完整攻擊鏈}
 \author{資安專題報告}
 \date{2025 年 3 月}
 \institute{資料來源：ESET Research (2025-02-20)}
@@ -60,14 +60,14 @@
     DeceptiveDevelopment（欺騙性開發）
   \end{block}
   \begin{itemize}
-    \item \textbf{攻擊者}：疑似北韓關聯威脅行為者
-    \item \textbf{目標}：從事加密貨幣／DeFi 專案的自由接案軟體開發者
+    \item \textbf{攻擊者}：疑似北韓關聯 Threat Actor
+    \item \textbf{目標}：從事 Cryptocurrency／DeFi 專案的 Freelance 軟體開發者
     \item \textbf{影響平台}：Windows、Linux、macOS
     \item \textbf{攻擊目的}：
       \begin{itemize}
-        \item 竊取加密貨幣錢包資產
-        \item 竊取瀏覽器憑證與信用卡資訊
-        \item 建立持久化遠端存取後門
+        \item 竊取 Cryptocurrency Wallet 資產
+        \item 竊取瀏覽器 Credentials 與信用卡資訊
+        \item 建立 Persistence Remote Access Backdoor
       \end{itemize}
   \end{itemize}
 \end{frame}
@@ -86,11 +86,11 @@
     arrow/.style={-{Stealth[length=3mm]}, thick, darkblue}
   ]
     \node[stage] (s1) {1. 建立假身分\\接觸目標};
-    \node[stage, right=of s1] (s2) {2. 社交工程\\提供木馬化專案};
-    \node[stage, right=of s2] (s3) {3. BeaverTail\\第一階段惡意程式};
+    \node[stage, right=of s1] (s2) {2. Social Engineering\\提供 Trojanized 專案};
+    \node[stage, right=of s2] (s3) {3. BeaverTail\\第一階段 Malware};
     \node[stage, below=of s1] (s4) {4. 下載 Python\\部署 InvisibleFerret};
-    \node[stage, below=of s2] (s5) {5. Payload 模組\\後門與鍵盤側錄};
-    \node[stage, below=of s3] (s6) {6. AnyDesk 模組\\持久化存取};
+    \node[stage, below=of s2] (s5) {5. Payload 模組\\Backdoor 與 Keylogger};
+    \node[stage, below=of s3] (s6) {6. AnyDesk 模組\\Persistence};
 
     \draw[arrow] (s1) -- (s2);
     \draw[arrow] (s2) -- (s3);
@@ -109,7 +109,7 @@
 \end{frame}
 
 % ============================================================
-\section{第一階段：社交工程與初始存取}
+\section{第一階段：Social Engineering 與 Initial Access}
 % ============================================================
 
 \begin{frame}{建立假身分與接觸目標}
@@ -118,8 +118,8 @@
       \textbf{偽裝手法}
       \begin{itemize}
         \item 複製真實人物個人檔案
-        \item 偽裝成公司招聘人員
-        \item 使用成熟帳號（含被入侵的真實帳號）增加可信度
+        \item 偽裝成公司 Recruiter
+        \item 使用成熟帳號（含被 Compromise 的真實帳號）增加可信度
       \end{itemize}
     \end{column}
     \begin{column}{0.5\textwidth}
@@ -140,7 +140,7 @@
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{社交工程誘騙方式}
+\begin{frame}{Social Engineering 誘騙方式}
   \begin{block}{誘餌類型}
     \begin{itemize}
       \item 「招聘程式挑戰」— 要求完成程式測試任務
@@ -148,63 +148,63 @@
     \end{itemize}
   \end{block}
 
-  \textbf{木馬化專案交付方式：}
+  \textbf{Trojanized 專案交付方式：}
   \begin{enumerate}
     \item 直接檔案傳輸
-    \item GitHub / GitLab / Bitbucket 私有倉庫連結
+    \item GitHub / GitLab / Bitbucket Private Repository 連結
       \begin{itemize}
         \item 要求受害者提供帳號 ID 或 email 以授權存取
         \item 藉此隱藏惡意活動的可見性
       \end{itemize}
   \end{enumerate}
 
-  \textbf{木馬化專案四大類型：}
+  \textbf{Trojanized 專案四大類型：}
   \begin{enumerate}
-    \item 招聘程式挑戰 (hiring challenges)
-    \item 加密貨幣專案 (cryptocurrency projects)
-    \item 含區塊鏈功能的遊戲
-    \item 含區塊鏈／加密貨幣功能的賭博應用
+    \item Hiring Challenges
+    \item Cryptocurrency Projects
+    \item 含 Blockchain 功能的遊戲
+    \item 含 Blockchain／Cryptocurrency 功能的賭博應用
   \end{enumerate}
 \end{frame}
 
 \begin{frame}{攻擊手段}
-  \begin{alertblock}{手段一、隱藏惡意程式}
-    將惡意 JavaScript 程式碼放在專案中一個\textbf{看似無關的後端組件}裡，
+  \begin{alertblock}{手段一、隱藏 Malicious Code}
+    將惡意 JavaScript 程式碼放在專案中一個\textbf{看似無關的 Backend Component}裡，
     在一段\textbf{超長註解之後}以單行附加，使其被推到畫面之外 (off-screen)
   \end{alertblock}
 
   \begin{itemize}
     \item GitHub 預設不啟用 word wrap
     \item 即使在線上檢視程式碼也很難發現
-    \item 倉庫通常複製現有開源專案或 demo，僅加入惡意程式碼並修改 README
+    \item Repository 通常複製現有 Open Source 專案或 demo，僅加入 Malicious Code 並修改 README
     \item 部分專案冒充合法公司，名稱加上 LLC、Ag、Inc 後綴
   \end{itemize}
 
   \vspace{0.3cm}
-  \begin{block}{手段二、替代感染途徑}
+  \begin{block}{手段二、替代 Compromise Vector}
     邀請參加線上視訊面試，提供假視訊會議網站（如 mirotalk[.]net），
-    受害者下載的「會議軟體」即為第一階段惡意程式的原生版本
+    受害者下載的「會議軟體」即為第一階段 Malware 的 Native 版本
   \end{block}
 \end{frame}
 
 % ============================================================
-\section{第二階段：BeaverTail 惡意程式}
+\section{第二階段：BeaverTail Malware}
 % ============================================================
 
-\begin{frame}{BeaverTail — 第一階段惡意程式}
+\begin{frame}{BeaverTail — 第一階段 Infostealer / Downloader}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \begin{block}{攻擊目標系統}
+      \begin{block}{Target Systems}
         \begin{itemize}
           \item Windows（所有版本）
           \item Linux
           \item macOS（含 Darwin 偵測）
         \end{itemize}
       \end{block}
-      \begin{block}{目標資訊}
+      \begin{block}{Target Information}
         \begin{itemize}
-          \item 加密貨幣錢包擴充套件資料
-          \item 瀏覽器儲存的登入憑證
+          \item Cryptocurrency Wallet Browser Extension 資料
+          \item 瀏覽器儲存的 Login Credentials
           \item Solana 金鑰（\texttt{id.json}）
           \item macOS Keychain / Linux Keyrings
           \item Firefox 密碼資料庫
@@ -214,28 +214,28 @@
     \begin{column}{0.48\textwidth}
       \begin{block}{JavaScript 版}
         \begin{itemize}
-          \item 直接嵌入木馬化專案
+          \item 直接嵌入 Trojanized 專案
           \item IP 與 port 以 base64 編碼，拆成三段並交換順序，前方加假字元阻礙解碼
         \end{itemize}
       \end{block}
-      \begin{block}{原生版 (C++ / Qt)}
+      \begin{block}{Native 版 (C++ / Qt)}
         \begin{itemize}
           \item 偽裝成視訊會議軟體
           \item 透過假會議網站散布
-          \item C\&C 位址以明文儲存
+          \item C\&C 位址以 Plaintext 儲存
         \end{itemize}
       \end{block}
     \end{column}
   \end{columns}
 
   \vspace{0.2cm}
-  \textbf{C\&C 連線：}硬編碼 IP，常用 port \texttt{1224} / \texttt{1244}
-  \hfill \textbf{每個樣本含唯一 victim ID}
+  \textbf{C\&C 連線：}Hardcoded IP，常用 port \texttt{1224} / \texttt{1244}
+  \hfill \textbf{每個 Sample 含唯一 Victim ID}
 \end{frame}
 
-\begin{frame}{BeaverTail — 資料竊取能力}
-  \begin{block}{目標擴充套件(寫死的)}
-    收集 Chrome、Edge、Opera、Brave 中的錢包擴充套件 \texttt{.ldb} 和 \texttt{.log} 檔案：
+\begin{frame}{BeaverTail — Data Stealing 能力}
+  \begin{block}{Target Extensions (Hardcoded)}
+    收集 Chrome、Edge、Opera、Brave 中的 Wallet Extension \texttt{.ldb} 和 \texttt{.log} 檔案：
     \begin{itemize}
       \item MetaMask、BNB Chain Wallet、Coinbase Wallet、TronLink
       \item Phantom、Ronin Wallet、Coin98 Wallet、Crypto.com Wallet
@@ -243,11 +243,11 @@
     \end{itemize}
   \end{block}
 
-  \begin{block}{竊取 Solana 金鑰}
+  \begin{block}{竊取 Solana Keys}
     搜尋 \texttt{\~{}/.config/solana/id.json}
   \end{block}
 
-  \begin{block}{竊取瀏覽器登入憑證}
+  \begin{block}{竊取瀏覽器 Login Credentials}
     \begin{itemize}
       \item \textbf{macOS：} \texttt{/Library/Keychains/login.keychain}
       \item \textbf{Linux：} \texttt{\~{}/.local/share/keyrings/}
@@ -257,16 +257,16 @@
 \end{frame}
 
 % ============================================================
-\section{第三階段：InvisibleFerret（四大模組）}
+\section{第三階段：InvisibleFerret（四大 Modules）}
 % ============================================================
 
 \begin{frame}{InvisibleFerret — 概述與部署流程}
-  \begin{block}{模組化 Python 後門，由四大模組組成}
+  \begin{block}{Modular Python Backdoor，由四大模組組成}
     \begin{enumerate}
-      \item \textbf{Main 模組}（\texttt{.npl}）— loader，負責下載與執行其他模組
-      \item \textbf{Payload 模組}（\texttt{pay}）— TCP 後門、鍵盤側錄、剪貼簿竊取
-      \item \textbf{Browser 模組}（\texttt{bow}）— 竊取瀏覽器密碼與信用卡
-      \item \textbf{AnyDesk 模組}（\texttt{adc}）— 持久化遠端存取
+      \item \textbf{Main Module}（\texttt{.npl}）— Loader，負責下載與執行其他模組
+      \item \textbf{Payload Module}（\texttt{pay}）— TCP Backdoor、Keylogger、Clipboard Stealer
+      \item \textbf{Browser Module}（\texttt{bow}）— 竊取瀏覽器密碼與信用卡
+      \item \textbf{AnyDesk Module}（\texttt{adc}）— Persistence Remote Access
     \end{enumerate}
   \end{block}
 
@@ -277,8 +277,8 @@
     \item 儲存於使用者家目錄，使用下載的 Python 環境執行
   \end{enumerate}
 
-  \begin{alertblock}{模組解密機制}
-    所有模組均以 \textbf{XOR 加密 + base64 編碼}封裝，前 4 bytes 為 XOR 金鑰，透過 \texttt{exec()} 執行
+  \begin{alertblock}{Module Decryption 機制}
+    所有模組均以 \textbf{XOR Encryption + base64 Encoding}封裝，前 4 bytes 為 XOR Key，透過 \texttt{exec()} 執行
   \end{alertblock}
 \end{frame}
 
@@ -287,10 +287,10 @@
     \begin{column}{0.52\textwidth}
       \textbf{自動執行功能：}
       \begin{itemize}
-        \item 系統指紋採集（UUID、OS、PC 名稱、使用者名稱、系統版本）
-        \item 取得本機 IP 與公開 IP
-        \item 透過 \texttt{ip-api.com} 取得地理位置
-        \item 上傳至 C\&C 的 \texttt{/keys} 端點
+        \item System Fingerprinting（UUID、OS、PC Name、Username、System Version）
+        \item 取得 Local IP 與 Public IP
+        \item 透過 \texttt{ip-api.com} 取得 Geolocation
+        \item 上傳至 C\&C 的 \texttt{/keys} Endpoint
       \end{itemize}
 
       \vspace{0.2cm}
@@ -303,7 +303,7 @@
       \vspace{0.2cm}
       \textbf{C\&C 位址：}
       \begin{itemize}
-        \item 以 base64 編碼後拆成兩半並交換順序，增加解碼難度
+        \item 以 base64 Encoding 後拆成兩半並交換順序，增加 Decoding 難度
       \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
@@ -320,102 +320,102 @@
       % \vspace{0.05cm}     
 
       \begin{alertblock}{注意}
-        除系統指紋自動採集外，所有後門功能均需操作者手動下達指令才會執行
+        除 System Fingerprinting 自動採集外，所有 Backdoor 功能均需 Operator 手動下達指令才會執行
       \end{alertblock}
     \end{column}
   \end{columns}
 \end{frame}
 
 \begin{frame}{Main 模組 — C\&C 通訊架構}
-  \begin{block}{C\&C 位址特性}
+  \begin{block}{C\&C Address 特性}
     \begin{itemize}
-      \item Main 模組的 C\&C 位址大多與前段 BeaverTail 相同
-      \item \textbf{Payload 模組的 C\&C 位址可能不同}，用以分離可疑的後門流量與初始部署流量
-      \item 所有客戶端到 C\&C 的通訊（除下載 Python 環境外）均包含 campaign ID
+      \item Main Module 的 C\&C 位址大多與前段 BeaverTail 相同
+      \item \textbf{Payload Module 的 C\&C 位址可能不同}，用以分離可疑的 Backdoor Traffic 與 Initial Deployment Traffic
+      \item 所有 Client 到 C\&C 的通訊（除下載 Python 環境外）均包含 Campaign ID
     \end{itemize}
   \end{block}
 
   \begin{block}{通訊格式}
     \begin{itemize}
-      \item \textbf{下載模組：}GET 請求，ID 附加於 URL 末端\\
+      \item \textbf{Module Download：}GET Request，ID 附加於 URL 末端\\
             格式：\texttt{<C\&C\_IP>:<port>/<module>/<sType>/<gType>}
-      \item \textbf{資料上傳：}HTTP POST，ID 放入 \texttt{type} 欄位
-      \item \textbf{後門通訊：}JSON over TCP socket，含 \texttt{code}（指令 ID）與 \texttt{args}（資料）兩欄位
+      \item \textbf{Data Exfiltration：}HTTP POST，ID 放入 \texttt{type} 欄位
+      \item \textbf{Backdoor 通訊：}JSON over TCP Socket，含 \texttt{code}（Command ID）與 \texttt{args}（Data）兩欄位
     \end{itemize}
   \end{block}
 \end{frame}
 
-\begin{frame}{模組二：Payload 模組（\texttt{pay}）— 後門指令}
-  \textbf{TCP 後門}（常用 port 1245，亦見 80、2245、3001、5000）
+\begin{frame}{模組二：Payload Module（\texttt{pay}）— Backdoor Commands}
+  \textbf{TCP Backdoor}（常用 port 1245，亦見 80、2245、3001、5000）
 
   \vspace{0.2cm}
   \begin{small}
   \begin{tabular}{ll}
     \toprule
-    \textbf{指令} & \textbf{功能} \\
+    \textbf{Command} & \textbf{Function} \\
     \midrule
-    \texttt{ssh\_cmd} & 終止操作並移除感染痕跡 \\
-    \texttt{ssh\_obj} & 透過系統 shell 執行任意指令 \\
-    \texttt{ssh\_clip} & 回傳鍵盤側錄與剪貼簿內容 \\
-    \texttt{ssh\_run} & 下載並執行 browser 模組 \\
-    \texttt{ssh\_upload} & 透過 FTP 外傳檔案（XOR 加密） \\
-    \texttt{ssh\_kill} & 終止 Chrome / Brave 進程 \\
-    \texttt{ssh\_any} & 下載並安裝 AnyDesk 模組 \\
-    \texttt{ssh\_env} & 上傳使用者家目錄等大量資料 \\
+    \texttt{ssh\_cmd} & Remove Compromise 痕跡 \\
+    \texttt{ssh\_obj} & 透過 System Shell 執行任意指令 \\
+    \texttt{ssh\_clip} & Exfiltrate Keylogger 與 Clipboard 內容 \\
+    \texttt{ssh\_run} & 下載並執行 Browser Module \\
+    \texttt{ssh\_upload} & 透過 FTP Exfiltrate 檔案（XOR Encrypted） \\
+    \texttt{ssh\_kill} & 終止 Chrome / Brave Process \\
+    \texttt{ssh\_any} & 下載並安裝 AnyDesk Module \\
+    \texttt{ssh\_env} & Upload 使用者 Home Directory 等大量資料 \\
     \bottomrule
   \end{tabular}
   \end{small}
 
   \vspace{0.3cm}
   \begin{itemize}
-    \item \textbf{鍵盤側錄}：僅 Windows，使用 \texttt{pyWinHook}
-    \item \textbf{剪貼簿竊取}：使用 \texttt{pyperclip} 監控內容變化
-    \item \textbf{FTP 外傳}：檔案以 XOR 加密（金鑰 \texttt{G01d\^{}6@(}），僅上傳 < 20MB
+    \item \textbf{Keylogger}：僅 Windows，使用 \texttt{pyWinHook}
+    \item \textbf{Clipboard Stealer}：使用 \texttt{pyperclip} 監控內容變化
+    \item \textbf{FTP Exfiltration}：檔案以 XOR Encryption（Key \texttt{G01d\^{}6@(}），僅上傳 < 20MB
   \end{itemize}
 \end{frame}
 
-\begin{frame}{模組三：Browser 模組（\texttt{bow}）— 瀏覽器資料竊取}
-  \textbf{目標瀏覽器：}Chrome、Brave、Opera、Yandex、Edge
+\begin{frame}{模組三：Browser Module（\texttt{bow}）— Browser Data Stealing}
+  \textbf{Target Browsers：}Chrome、Brave、Opera、Yandex、Edge
 
   \vspace{0.3cm}
-  \begin{block}{竊取內容}
+  \begin{block}{Stolen Data}
     \begin{itemize}
-      \item \texttt{LoginData.db} — 使用者登入資訊（帳號密碼）
-      \item \texttt{webdata.db} — 儲存的信用卡資訊
+      \item \texttt{LoginData.db} — User Login Information（Credentials）
+      \item \texttt{webdata.db} — Saved Credit Card Information
     \end{itemize}
   \end{block}
 
   \vspace{0.3cm}
-  \textbf{AES 解密金鑰取得方式：}
+  \textbf{AES Decryption Key 取得方式：}
   \begin{itemize}
     \item \textbf{Windows：}從瀏覽器 \texttt{Local State} 檔案取得
-    \item \textbf{Linux：}透過 \texttt{secretstorage} 套件取得
-    \item \textbf{macOS：}透過 \texttt{security} 工具取得
+    \item \textbf{Linux：}透過 \texttt{secretstorage} Package 取得
+    \item \textbf{macOS：}透過 \texttt{security} Utility 取得
   \end{itemize}
 
   \vspace{0.3cm}
-  資料透過 HTTP POST 上傳至 C\&C 的 \texttt{/keys} 端點
+  資料透過 HTTP POST 上傳至 C\&C 的 \texttt{/keys} Endpoint
 \end{frame}
 
-\begin{frame}{模組四：AnyDesk 模組（\texttt{adc}）— 持久化遠端存取}
-  \begin{alertblock}{持久化機制}
-    利用合法遠端桌面軟體 AnyDesk 建立持久後門
+\begin{frame}{模組四：AnyDesk Module（\texttt{adc}）— Persistence}
+  \begin{alertblock}{Persistence Mechanism}
+    利用合法 Remote Desktop 軟體 AnyDesk 建立 Persistent Backdoor
   \end{alertblock}
 
   \textbf{部署流程：}
   \begin{enumerate}
     \item 檢查 \texttt{C:/Program Files (x86)/AnyDesk/AnyDesk.exe} 是否存在
-    \item 若無，從 C\&C 下載 \texttt{anydesk.exe} 至使用者家目錄
-    \item 將硬編碼的 password hash、salt、token salt 寫入設定檔
-    \item 確保攻擊者可隨時遠端存取
+    \item 若無，從 C\&C 下載 \texttt{anydesk.exe} 至使用者 Home Directory
+    \item 將 Hardcoded 的 Password Hash、Salt、Token Salt 寫入設定檔
+    \item 確保攻擊者可隨時 Remote Access
   \end{enumerate}
 
   \vspace{0.3cm}
   \textbf{備用方案：}
   \begin{itemize}
-    \item 若直接修改設定失敗，建立 \texttt{conf.ps1} PowerShell 腳本修改設定
-    \item 終止 AnyDesk 進程後重新啟動以載入新設定
-    \item 模組最後呼叫 \texttt{os.remove} 刪除自身（反鑑識）
+    \item 若直接修改設定失敗，建立 \texttt{conf.ps1} PowerShell Script 修改設定
+    \item 終止 AnyDesk Process 後重新啟動以載入新設定
+    \item 模組最後呼叫 \texttt{os.remove} 刪除自身（Anti-forensics）
   \end{itemize}
 \end{frame}
 
@@ -426,8 +426,8 @@
 \begin{frame}{2024 年 8 月後版本更新（一）— 架構與識別碼}
   \begin{block}{架構變化}
     \begin{itemize}
-      \item InvisibleFerret 合併為\textbf{單一腳本}（不再分獨立模組）
-      \item 專案中的程式碼改為 \textbf{loader}，從遠端下載實際 payload
+      \item InvisibleFerret 合併為\textbf{單一 Script}（不再分獨立模組）
+      \item 專案中的程式碼改為 \textbf{Loader}，從遠端下載實際 Payload
     \end{itemize}
   \end{block}
 
@@ -444,43 +444,43 @@
 \begin{frame}{2024 年 8 月後版本更新（二）— 新增功能}
   \begin{alertblock}{新增 ssh\_zcp 指令}
     \begin{itemize}
-      \item 可從 \textbf{88 個瀏覽器擴充套件}中提取資料
-      \item 竊取 Atomic、Exodus 加密貨幣錢包
-      \item 竊取 1Password、Electrum、WinAuth、Proxifier4、Dashlane 等密碼管理器
+      \item 可從 \textbf{88 個 Browser Extensions}中提取資料
+      \item 竊取 Atomic、Exodus Cryptocurrency Wallet
+      \item 竊取 1Password、Electrum、WinAuth、Proxifier4、Dashlane 等 Password Manager
     \end{itemize}
   \end{alertblock}
 
-  \begin{block}{資料外傳至 Telegram}
-    使用 Telegram Bot API 將 ZIP/7z 檔案上傳至 Telegram 聊天室，同時傳至 FTP
+  \begin{block}{Exfiltration via Telegram}
+    使用 Telegram Bot API 將 ZIP/7z 檔案上傳至 Telegram Chat，同時傳至 FTP
   \end{block}
 \end{frame}
 
-\begin{frame}{2024 年 12 月 — 獨立 Clipboard Stealer}
+\begin{frame}{2024 年 12 月 — 獨立 Clipboard Stealer Module}
   \begin{block}{新模組 \texttt{mlip}}
     \begin{itemize}
-      \item 從端點 \texttt{/mclip/<campaign\_ID>} 下載至 \texttt{.n2/mlip}
-      \item 將鍵盤側錄與剪貼簿竊取功能獨立出來
-      \item \textbf{精準化監控：}僅監控 \texttt{chrome.exe} 和 \texttt{brave.exe}
-      \item 資料上傳至新端點 \texttt{/api/clip}
+      \item 從 Endpoint \texttt{/mclip/<campaign\_ID>} 下載至 \texttt{.n2/mlip}
+      \item 將 Keylogger 與 Clipboard Stealer 功能獨立出來
+      \item \textbf{Targeted Monitoring：}僅監控 \texttt{chrome.exe} 和 \texttt{brave.exe}
+      \item 資料上傳至新 Endpoint \texttt{/api/clip}
     \end{itemize}
   \end{block}
 
   \vspace{0.3cm}
   \textbf{演進趨勢：}
   \begin{itemize}
-    \item 從廣泛監控 $\rightarrow$ 精準化目標監控
-    \item 模組化 $\rightarrow$ 單一腳本 $\rightarrow$ 再次模組化（功能分離）
-    \item 持續擴大竊取範圍（88 個擴充套件 + 密碼管理器）
+    \item 從廣泛監控 $\rightarrow$ Targeted Monitoring
+    \item Modular $\rightarrow$ Single Script $\rightarrow$ 再次 Modular（功能分離）
+    \item 持續擴大竊取範圍（88 個 Extensions + Password Managers）
   \end{itemize}
 \end{frame}
 
 % ============================================================
-\section{網路基礎設施}
+\section{Network Infrastructure}
 % ============================================================
 
-\begin{frame}{C\&C 網路基礎設施}
-  \begin{block}{伺服器託管}
-    租用商業主機商的專用伺服器：
+\begin{frame}{C\&C Network Infrastructure}
+  \begin{block}{Server Hosting}
+    租用商業 Hosting Provider 的 Dedicated Server：
     \begin{itemize}
       \item RouterHosting / Cloudzy
       \item Stark Industries Solutions
@@ -488,67 +488,67 @@
     \end{itemize}
   \end{block}
 
-  \begin{block}{伺服器 API 端點（Node.js）}
+  \begin{block}{Server API Endpoints（Node.js）}
     \begin{small}
     \texttt{/pdown}、\texttt{/uploads}、\texttt{/client/<ID>}、\texttt{/payload/<ID>}、
     \texttt{/brow/<ID>}、\texttt{/adc/<ID>}、\texttt{/mclip/<ID>}、\texttt{/keys}、\texttt{/api/clip}
     \end{small}
   \end{block}
 
-  \begin{block}{通訊協定}
+  \begin{block}{Communication Protocol}
     \begin{itemize}
       \item \textbf{C\&C 通訊：}HTTP（port 1224 / 1244 / 80 / 3000）
-      \item \textbf{後門通訊：}TCP socket（port 1245 / 80 / 2245 / 3001 / 5000）
-      \item 前後段使用不同 C\&C IP 以分離可疑流量
+      \item \textbf{Backdoor 通訊：}TCP Socket（port 1245 / 80 / 2245 / 3001 / 5000）
+      \item 前後段使用不同 C\&C IP 以分離可疑 Traffic
     \end{itemize}
   \end{block}
 \end{frame}
 
 % ============================================================
-\section{MITRE ATT\&CK 對應}
+\section{MITRE ATT\&CK Mapping}
 % ============================================================
 
-\begin{frame}{MITRE ATT\&CK 技術對應}
+\begin{frame}{MITRE ATT\&CK Technique Mapping}
   \begin{small}
   \begin{tabular}{lll}
     \toprule
-    \textbf{戰術} & \textbf{技術} & \textbf{對應行為} \\
+    \textbf{Tactic} & \textbf{Technique} & \textbf{對應行為} \\
     \midrule
-    Initial Access & T1566 (Phishing) & 假招募社交工程 \\
-    Execution & T1204 (User Execution) & 受害者執行木馬專案 \\
-    Persistence & T1219 (Remote Access) & AnyDesk 持久化 \\
-    Credential Access & T1555 (Browser Creds) & 瀏覽器密碼竊取 \\
-    Credential Access & T1056 (Keylogging) & pyWinHook 鍵盤側錄 \\
-    Collection & T1115 (Clipboard) & pyperclip 剪貼簿竊取 \\
-    Exfiltration & T1041 (C2 Channel) & HTTP/FTP 外傳 \\
-    Exfiltration & T1567 (Web Service) & Telegram Bot 外傳 \\
-    Defense Evasion & T1027 (Obfuscation) & XOR + base64 混淆 \\
+    Initial Access & T1566 (Phishing) & 假招募 Social Engineering \\
+    Execution & T1204 (User Execution) & 受害者執行 Trojanized 專案 \\
+    Persistence & T1219 (Remote Access) & AnyDesk Persistence \\
+    Credential Access & T1555 (Browser Creds) & 瀏覽器 Credential Stealing \\
+    Credential Access & T1056 (Keylogging) & pyWinHook Keylogger \\
+    Collection & T1115 (Clipboard) & pyperclip Clipboard Stealer \\
+    Exfiltration & T1041 (C2 Channel) & HTTP/FTP Exfiltration \\
+    Exfiltration & T1567 (Web Service) & Telegram Bot Exfiltration \\
+    Defense Evasion & T1027 (Obfuscation) & XOR + base64 Obfuscation \\
     \bottomrule
   \end{tabular}
   \end{small}
 \end{frame}
 
 % ============================================================
-\section{IoC 指標摘要}
+\section{IoC 摘要}
 % ============================================================
 
-\begin{frame}{IoC（入侵指標）摘要}
-  \begin{block}{檔案指標}
+\begin{frame}{IoC（Indicators of Compromise）摘要}
+  \begin{block}{File Indicators}
     \begin{itemize}
-      \item 使用者家目錄下的 \texttt{.npl} 檔案
-      \item \texttt{.n2/} 目錄（含 \texttt{pay}、\texttt{bow}、\texttt{mlip} 模組）
-      \item \texttt{p2.zip}（獨立 Python 環境）
-      \item \texttt{conf.ps1}（AnyDesk 設定修改腳本）
+      \item 使用者 Home Directory 下的 \texttt{.npl} 檔案
+      \item \texttt{.n2/} 目錄（含 \texttt{pay}、\texttt{bow}、\texttt{mlip} Modules）
+      \item \texttt{p2.zip}（Standalone Python Environment）
+      \item \texttt{conf.ps1}（AnyDesk Configuration Script）
     \end{itemize}
   \end{block}
 
-  \begin{block}{網路指標}
+  \begin{block}{Network Indicators}
     \begin{itemize}
       \item Port 1224、1244（HTTP C\&C）
-      \item Port 1245、2245（TCP 後門）
-      \item API 端點：\texttt{/uploads}、\texttt{/client/}、\texttt{/payload/}、\texttt{/keys}、\texttt{/api/clip}
+      \item Port 1245、2245（TCP Backdoor）
+      \item API Endpoints：\texttt{/uploads}、\texttt{/client/}、\texttt{/payload/}、\texttt{/keys}、\texttt{/api/clip}
       \item 假視訊會議網站：\texttt{mirotalk[.]net}
-      \item Telegram Bot API 外傳
+      \item Telegram Bot API Exfiltration
     \end{itemize}
   \end{block}
 \end{frame}
@@ -556,11 +556,11 @@
 % ===== 結論 =====
 \begin{frame}{結論}
   \begin{itemize}
-    \item DeceptiveDevelopment 是一個\textbf{高度針對性}的攻擊活動
-    \item 結合社交工程與多階段惡意程式，形成完整攻擊鏈
+    \item DeceptiveDevelopment 是一個\textbf{高度 Targeted}的攻擊活動
+    \item 結合 Social Engineering 與多階段 Malware，形成完整 Kill Chain
     \item 持續演進更新，擴大竊取範圍與隱蔽性
-    \item 利用開發者對開源專案的信任作為初始存取向量
-    \item 跨平台能力（Windows / Linux / macOS）擴大攻擊面
+    \item 利用開發者對 Open Source 專案的信任作為 Initial Access Vector
+    \item 跨平台能力（Windows / Linux / macOS）擴大 Attack Surface
   \end{itemize}
 
   \vspace{0.5cm}
