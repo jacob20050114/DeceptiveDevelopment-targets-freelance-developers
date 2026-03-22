@@ -35,9 +35,9 @@
 
 \title{DeceptiveDevelopment 攻擊活動分析報告}
 \subtitle{從假招募到 Cryptocurrency 竊取的完整攻擊鏈}
-\author{資安專題報告}
-\date{2025 年 3 月}
-\institute{資料來源：ESET Research (2025-02-20)}
+\author{趙子佾、吳秉哲}
+\date{}
+% \institute{資料來源：ESET Research (2025-02-20)}
 
 \begin{document}
 
@@ -102,7 +102,7 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{攻擊練總覽（續）}
+\begin{frame}{攻擊鏈總覽（續）}
   \begin{center}
     \includegraphics[width=0.85\textwidth]{assets/figure6.png}
   \end{center}
@@ -152,10 +152,10 @@
   \begin{enumerate}
     \item 直接檔案傳輸
     \item GitHub / GitLab / Bitbucket Private Repository 連結
-      \begin{itemize}
-        \item 要求受害者提供帳號 ID 或 email 以授權存取
-        \item 藉此隱藏惡意活動的可見性
-      \end{itemize}
+      % \begin{itemize}
+      %   \item 要求受害者提供帳號 ID 或 email 以授權存取
+      %   \item 藉此隱藏惡意活動的可見性
+      % \end{itemize}
   \end{enumerate}
 
   \textbf{Trojanized 專案四大類型：}
@@ -168,10 +168,10 @@
 \end{frame}
 
 \begin{frame}{攻擊手段}
-  \begin{alertblock}{手段一、隱藏 Malicious Code}
+  \begin{block}{手段一、隱藏 Malicious Code}
     將惡意 JavaScript 程式碼放在專案中一個\textbf{看似無關的 Backend Component}裡，
     在一段\textbf{超長註解之後}以單行附加，使其被推到畫面之外 (off-screen)
-  \end{alertblock}
+  \end{block}
 
   \begin{itemize}
     \item GitHub 預設不啟用 word wrap
@@ -257,6 +257,50 @@
 \end{frame}
 
 % ============================================================
+\section{補充：Browser Wallet Extension 架構}
+% ============================================================
+
+\begin{frame}{Browser Wallet Extension 內部架構}
+  \begin{block}{三層隔離執行環境}
+    \begin{enumerate}
+      \item \textbf{DApp 分頁}（網頁 JS 環境）\\
+            透過 \texttt{window.ethereum}（Provider，EIP-1193）與 Wallet 溝通，\textbf{無法直接存取私鑰}
+      \item \textbf{Content Script}（注入腳本）\\
+            與 DApp 共享 DOM 但擁有獨立 JS scope，作為 DApp 與 Extension 的中介，透過 \texttt{chrome.runtime.sendMessage()} 轉發請求
+      \item \textbf{Extension Process}（完全隔離）
+            \begin{itemize}
+              \item \textbf{Background Service Worker}：核心邏輯處理器，負責金鑰管理、RPC 廣播、權限管理
+              \item \textbf{Popup UI}：使用者確認視窗（連接授權、交易詳情）
+              \item \textbf{Keystore}：私鑰以 AES-256-GCM 加密存放於本機磁碟
+            \end{itemize}
+    \end{enumerate}
+  \end{block}
+\end{frame}
+
+\begin{frame}{金鑰系統與安全邊界}
+  \begin{block}{助記詞 → 私鑰 → 地址 的衍生過程}
+    \begin{itemize}
+      \item 助記詞（12/24 個英文單字）$\xrightarrow{\text{BIP-39}}$ 512-bit Seed
+      \item Seed $\xrightarrow{\text{BIP-32/44}}$ 私鑰（32 bytes，secp256k1）
+      \item 私鑰 $\xrightarrow{\text{橢圓曲線}}$ 公鑰 $\xrightarrow{\text{Keccak-256}}$ 地址（0x 開頭，20 bytes）
+      \item Solana 使用 Ed25519，公鑰直接等於錢包地址（Base58）
+    \end{itemize}
+  \end{block}
+
+  % \begin{block}{私鑰的本地加密儲存}
+  %   \begin{itemize}
+  %     \item 使用者密碼 $\xrightarrow{\text{PBKDF2/scrypt}}$ Derived Key $\xrightarrow{\text{AES-256-GCM}}$ 加密後的 Keystore JSON
+  %     \item MetaMask Vault 儲存於 \texttt{chrome.storage.local}
+  %     \item \textbf{私鑰永遠不離開本機}，簽名在本地完成，僅送出已簽名的交易
+  %   \end{itemize}
+  % \end{block}
+
+  \begin{alertblock}{攻擊者為何竊取 \texttt{.ldb} / \texttt{.log} 檔案？}
+    這些檔案位於 Extension 的 Local Storage 目錄，可能包含加密後的 Vault 資料。若攻擊者取得這些檔案，可離線嘗試暴力破解使用者密碼以還原私鑰。
+  \end{alertblock}
+\end{frame}
+
+% ============================================================
 \section{第三階段：InvisibleFerret（四大 Modules）}
 % ============================================================
 
@@ -289,19 +333,17 @@
       \begin{itemize}
         \item System Fingerprinting（UUID、OS、PC Name、Username、System Version）
         \item 取得 Local IP 與 Public IP
-        \item 透過 \texttt{ip-api.com} 取得 Geolocation
+        % \item 透過 \texttt{ip-api.com} 取得 Geolocation
         \item 上傳至 C\&C 的 \texttt{/keys} Endpoint
       \end{itemize}
 
-      \vspace{0.2cm}
       \textbf{下載子模組：}
       \begin{itemize}
         \item \texttt{/payload/<ID>} $\rightarrow$ \texttt{.n2/pay}
         \item \texttt{/brow/<ID>} $\rightarrow$ \texttt{.n2/bow}（非 macOS）
       \end{itemize}
 
-      \vspace{0.2cm}
-      \textbf{C\&C 位址：}
+      C\&C 位址：
       \begin{itemize}
         \item 以 base64 Encoding 後拆成兩半並交換順序，增加 Decoding 難度
       \end{itemize}
@@ -319,22 +361,24 @@
       \end{block}
       % \vspace{0.05cm}     
 
-      \begin{alertblock}{注意}
-        除 System Fingerprinting 自動採集外，所有 Backdoor 功能均需 Operator 手動下達指令才會執行
-      \end{alertblock}
+      % \begin{alertblock}{注意}
+      %   除 System Fingerprinting 自動採集外，所有 Backdoor 功能均需 C\&C 手動下達指令才會執行
+      % \end{alertblock}
     \end{column}
   \end{columns}
 \end{frame}
 
 \begin{frame}{Main 模組 — C\&C 通訊架構}
-  \begin{block}{C\&C Address 特性}
+  \begin{block}{Main Module 與 C\&C 的通訊重點}
     \begin{itemize}
-      \item Main Module 的 C\&C 位址大多與前段 BeaverTail 相同
-      \item \textbf{Payload Module 的 C\&C 位址可能不同}，用以分離可疑的 Backdoor Traffic 與 Initial Deployment Traffic
-      \item 所有 Client 到 C\&C 的通訊（除下載 Python 環境外）均包含 Campaign ID
+      \item 啟動後自動透過 HTTP POST 將 System Fingerprint 上傳至 C\&C 的 \texttt{/keys} 端點，依 C\&C 回應下載子模組（Payload / Browser / AnyDesk / Clipboard）
+      \item \textbf{Payload Module 的 C\&C 位址可能與 Main Module 不同}，藉此將 Backdoor Traffic 與 Initial Deployment Traffic 分離，降低被偵測的風險
+      \item 所有 Client 與 C\&C 的通訊（除下載 Python 環境外）均帶有 Campaign ID，確保 Operator 可追蹤每位 Victim
     \end{itemize}
   \end{block}
+\end{frame}
 
+\begin{frame}{Main 模組 — C\&C 通訊架構}
   \begin{block}{通訊格式}
     \begin{itemize}
       \item \textbf{Module Download：}GET Request，ID 附加於 URL 末端\\
@@ -372,6 +416,29 @@
     \item \textbf{Clipboard Stealer}：使用 \texttt{pyperclip} 監控內容變化
     \item \textbf{FTP Exfiltration}：檔案以 XOR Encryption（Key \texttt{G01d\^{}6@(}），僅上傳 < 20MB
   \end{itemize}
+\end{frame}
+
+\begin{frame}{補充：Clipboard}
+  \begin{block}{Clipboard（剪貼簿）}
+    \begin{itemize}
+      \item 作業系統提供的暫存區域，用於在不同應用程式之間複製與貼上資料
+      \item 當使用者執行「複製」時，資料（文字、圖片等）會暫存於 Clipboard
+      \item 攻擊者利用 \texttt{pyperclip} 持續監控 Clipboard 內容變化，可竊取使用者複製的密碼、Cryptocurrency Wallet Address、敏感文字等
+      \item 危險：使用者習慣以複製貼上方式輸入密碼或轉帳地址
+    \end{itemize}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}{補充：FTP}
+  \begin{block}{FTP（File Transfer Protocol）}
+    \begin{itemize}
+      \item 一種用於在網路上傳輸檔案的標準通訊協定（RFC 959）
+      \item 採用 Client-Server 架構，Client 連線至 FTP Server 進行檔案上傳或下載
+      \item 在本攻擊中，Payload Module 透過 FTP 將竊取的檔案（XOR Encrypted）上傳至攻擊者控制的 Server
+      \item 攻擊者選擇 FTP 而非 HTTP 的原因：適合大量檔案批次傳輸，且較不易被 Web Application Firewall 攔截
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}{模組三：Browser Module（\texttt{bow}）— Browser Data Stealing}
