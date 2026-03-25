@@ -187,6 +187,7 @@
   \end{block}
 \end{frame}
 
+
 % ============================================================
 \section{第二階段：BeaverTail Malware}
 % ============================================================
@@ -260,32 +261,38 @@
 \section{補充：Browser Wallet Extension 架構}
 % ============================================================
 
+% \begin{frame}{Browser Wallet Extension 內部架構}
+%   \begin{block}{三層隔離執行環境}
+%     \begin{enumerate}
+%       \item \textbf{DApp 分頁}（網頁 JS 環境）\\
+%             透過 \texttt{window.ethereum}（Provider，EIP-1193）與 Wallet 溝通，\textbf{無法直接存取私鑰}
+%       \item \textbf{Content Script}（注入腳本）\\
+%             與 DApp 共享 DOM 但擁有獨立 JS scope，作為 DApp 與 Extension 的中介，透過 \texttt{chrome.runtime.sendMessage()} 轉發請求
+%       \item \textbf{Extension Process}（完全隔離）
+%             \begin{itemize}
+%               \item \textbf{Background Service Worker}：核心邏輯處理器，負責金鑰管理、RPC 廣播、權限管理
+%               \item \textbf{Popup UI}：使用者確認視窗（連接授權、交易詳情）
+%               \item \textbf{Keystore}：私鑰以 AES-256-GCM 加密存放於本機磁碟
+%             \end{itemize}
+%     \end{enumerate}
+%   \end{block}
+% \end{frame}
+
 \begin{frame}{Browser Wallet Extension 內部架構}
-  \begin{block}{三層隔離執行環境}
-    \begin{enumerate}
-      \item \textbf{DApp 分頁}（網頁 JS 環境）\\
-            透過 \texttt{window.ethereum}（Provider，EIP-1193）與 Wallet 溝通，\textbf{無法直接存取私鑰}
-      \item \textbf{Content Script}（注入腳本）\\
-            與 DApp 共享 DOM 但擁有獨立 JS scope，作為 DApp 與 Extension 的中介，透過 \texttt{chrome.runtime.sendMessage()} 轉發請求
-      \item \textbf{Extension Process}（完全隔離）
-            \begin{itemize}
-              \item \textbf{Background Service Worker}：核心邏輯處理器，負責金鑰管理、RPC 廣播、權限管理
-              \item \textbf{Popup UI}：使用者確認視窗（連接授權、交易詳情）
-              \item \textbf{Keystore}：私鑰以 AES-256-GCM 加密存放於本機磁碟
-            \end{itemize}
-    \end{enumerate}
-  \end{block}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{assets/browser extension.png}
+  \end{center}
 \end{frame}
 
 \begin{frame}{金鑰系統與安全邊界}
-  \begin{block}{助記詞 → 私鑰 → 地址 的衍生過程}
-    \begin{itemize}
-      \item 助記詞（12/24 個英文單字）$\xrightarrow{\text{BIP-39}}$ 512-bit Seed
-      \item Seed $\xrightarrow{\text{BIP-32/44}}$ 私鑰（32 bytes，secp256k1）
-      \item 私鑰 $\xrightarrow{\text{橢圓曲線}}$ 公鑰 $\xrightarrow{\text{Keccak-256}}$ 地址（0x 開頭，20 bytes）
-      \item Solana 使用 Ed25519，公鑰直接等於錢包地址（Base58）
-    \end{itemize}
-  \end{block}
+%   \begin{block}{助記詞 → 私鑰 → 地址 的衍生過程}
+%     \begin{itemize}
+%       \item 助記詞（12/24 個英文單字）$\xrightarrow{\text{BIP-39}}$ 512-bit Seed
+%       \item Seed $\xrightarrow{\text{BIP-32/44}}$ 私鑰（32 bytes，secp256k1）
+%       \item 私鑰 $\xrightarrow{\text{橢圓曲線}}$ 公鑰 $\xrightarrow{\text{Keccak-256}}$ 地址（0x 開頭，20 bytes）
+%       \item Solana 使用 Ed25519，公鑰直接等於錢包地址（Base58）
+%     \end{itemize}
+%   \end{block}
 
   % \begin{block}{私鑰的本地加密儲存}
   %   \begin{itemize}
@@ -298,6 +305,12 @@
   \begin{alertblock}{攻擊者為何竊取 \texttt{.ldb} / \texttt{.log} 檔案？}
     這些檔案位於 Extension 的 Local Storage 目錄，可能包含加密後的 Vault 資料。若攻擊者取得這些檔案，可離線嘗試暴力破解使用者密碼以還原私鑰。
   \end{alertblock}
+\end{frame}
+
+\begin{frame}{金鑰系統與安全邊界}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{assets/solana key.png}
+  \end{center}
 \end{frame}
 
 % ============================================================
