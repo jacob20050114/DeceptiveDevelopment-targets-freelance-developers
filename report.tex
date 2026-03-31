@@ -285,22 +285,24 @@
 \end{frame}
 
 \begin{frame}{金鑰系統與安全邊界}
-%   \begin{block}{助記詞 → 私鑰 → 地址 的衍生過程}
-%     \begin{itemize}
-%       \item 助記詞（12/24 個英文單字）$\xrightarrow{\text{BIP-39}}$ 512-bit Seed
-%       \item Seed $\xrightarrow{\text{BIP-32/44}}$ 私鑰（32 bytes，secp256k1）
-%       \item 私鑰 $\xrightarrow{\text{橢圓曲線}}$ 公鑰 $\xrightarrow{\text{Keccak-256}}$ 地址（0x 開頭，20 bytes）
-%       \item Solana 使用 Ed25519，公鑰直接等於錢包地址（Base58）
-%     \end{itemize}
-%   \end{block}
+  \begin{block}{助記詞 → 私鑰 → 地址 的衍生過程}
+    \begin{itemize}
+      \item 助記詞（12/24 個英文單字）$\xrightarrow{\text{BIP-39}}$ 512-bit Seed
+      \item Seed $\xrightarrow{\text{BIP-32/44}}$ 私鑰（32 bytes，secp256k1）
+      \item 私鑰 $\xrightarrow{\text{橢圓曲線}}$ 公鑰 $\xrightarrow{\text{Keccak-256}}$ 地址（0x 開頭，20 bytes）
+      \item Solana 使用 Ed25519，公鑰直接等於錢包地址（Base58）
+    \end{itemize}
+  \end{block}
+\end{frame}
 
-  % \begin{block}{私鑰的本地加密儲存}
-  %   \begin{itemize}
-  %     \item 使用者密碼 $\xrightarrow{\text{PBKDF2/scrypt}}$ Derived Key $\xrightarrow{\text{AES-256-GCM}}$ 加密後的 Keystore JSON
-  %     \item MetaMask Vault 儲存於 \texttt{chrome.storage.local}
-  %     \item \textbf{私鑰永遠不離開本機}，簽名在本地完成，僅送出已簽名的交易
-  %   \end{itemize}
-  % \end{block}
+\begin{frame}{金鑰系統與安全邊界}
+  \begin{block}{私鑰的本地加密儲存}
+    \begin{itemize}
+      \item 使用者密碼 $\xrightarrow{\text{PBKDF2/scrypt}}$ Derived Key $\xrightarrow{\text{AES-256-GCM}}$ 加密後的 Keystore JSON
+      \item MetaMask Vault 儲存於 \texttt{chrome.storage.local}
+      \item \textbf{私鑰永遠不離開本機}，簽名在本地完成，僅送出已簽名的交易
+    \end{itemize}
+  \end{block}
 
   \begin{alertblock}{攻擊者為何竊取 \texttt{.ldb} / \texttt{.log} 檔案？}
     這些檔案位於 Extension 的 Local Storage 目錄，可能包含加密後的 Vault 資料。若攻擊者取得這些檔案，可離線嘗試暴力破解使用者密碼以還原私鑰。
