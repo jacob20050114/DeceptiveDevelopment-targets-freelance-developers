@@ -9,8 +9,8 @@
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit}
 
 % 設定中文字型
-\setCJKmainfont{標楷體}
-\setCJKsansfont{標楷體}
+\setCJKmainfont[AutoFakeBold=3]{標楷體}
+\setCJKsansfont[AutoFakeBold=3]{標楷體}
 \setCJKmonofont{標楷體}
 
 \usetheme{Madrid}
@@ -197,9 +197,9 @@
     \begin{column}{0.48\textwidth}
       \begin{block}{Target Systems}
         \begin{itemize}
-          \item Windows（所有版本）
+          \item Windows
           \item Linux
-          \item macOS（含 Darwin 偵測）
+          \item macOS
         \end{itemize}
       \end{block}
     \end{column}
@@ -228,6 +228,7 @@
       \end{block}
     \end{column}
     \begin{column}{0.48\textwidth}
+% 「Native」的核心意思是：直接編譯給作業系統執行的二進位檔，不需要 Node.js / Python 等 runtime 就能跑，跨平台支援 Windows、Linux、macOS。
       \begin{block}{Native 版（C++ / Qt）}
         \begin{itemize}
           \item 編譯成原生執行檔（.exe / macOS app）
@@ -271,7 +272,7 @@
       \item 搜尋使用者家目錄下的 \texttt{\~{}/.config/solana/id.json}
       \item 此檔案為 Solana CLI 預設儲存私鑰的位置
       \item Solana CLI 是 Solana 官方提供的命令列工具，可以直接在 Terminal 操作
-      \item 取得後可直接控制對應錢包地址的所有資產
+      \item 由於私鑰是明文儲存，因此取得後可直接控制對應錢包地址的所有資產
     \end{itemize}
   \end{block}
 \end{frame}
@@ -320,28 +321,44 @@
 % \end{frame}
 
 \begin{frame}{金鑰系統}
-  \begin{block}{助記詞 → 私鑰 → 地址 的衍生過程}
-    \begin{itemize}
-      \item 助記詞（12/24 個英文單字）$\xrightarrow{\text{BIP-39}}$ 512-bit Seed
-      \item Seed $\xrightarrow{\text{BIP-32/44}}$ 私鑰（32 bytes，secp256k1）
-      \item 私鑰 $\xrightarrow{\text{橢圓曲線}}$ 公鑰 $\xrightarrow{\text{Keccak-256}}$ 地址（0x 開頭，20 bytes）
-      \item Solana 使用 Ed25519，公鑰直接等於錢包地址（Base58）
-    \end{itemize}
+  \begin{block}{助記詞、seed和私鑰的衍生過程}
+    \small
+    \begin{enumerate}
+      \item 錢包建立時產生\textbf{隨機亂數}（128/256 bits）
+            $\xrightarrow{\text{BIP-39 編碼}}$
+            \textbf{助記詞}（12/24 個英文單字）
+      \item 助記詞
+            $\xrightarrow{\text{BIP-39 + PBKDF2（單向）}}$
+            512-bit \textbf{Seed}\\
+            \textit{※ Seed 無法反推回助記詞，兩者並非等價}
+      \item Seed
+            $\xrightarrow{\text{BIP-32/44（HD Wallet，單向）}}$
+            \textbf{私鑰}（32 bytes，secp256k1）\\
+            \textit{※ 同一 Seed 可衍生無數組私鑰（不同路徑 = 不同帳戶）}
+      \item 私鑰
+            $\xrightarrow{\text{橢圓曲線乘法（離散對數，不可逆）}}$
+            \textbf{公鑰}
+      \item 公鑰
+            $\xrightarrow{\text{Keccak-256 雜湊（不可逆）}}$
+            \textbf{地址}（0x 開頭，20 bytes）
+    \end{enumerate}
   \end{block}
+  \vspace{0.1cm}
+  \small Solana 使用 Ed25519，公鑰\textbf{直接等於}錢包地址（Base58），無需額外雜湊\\
+  \textbf{備份原則：}只需備份助記詞，即可還原整條鏈下的所有帳戶
 \end{frame}
 % https://vocus.cc/article/6512b6fbfd89780001dfe7c9
 
 \begin{frame}{金鑰系統}
   \begin{block}{私鑰的本地加密儲存}
     \begin{itemize}
-      \item 使用者密碼 $\xrightarrow{\text{PBKDF2/scrypt}}$ Derived Key $\xrightarrow{\text{AES-256-GCM}}$ 加密後的 Keystore JSON
-      \item MetaMask Vault 儲存於 \texttt{chrome.storage.local}
-      \item \textbf{私鑰永遠不離開本機}，簽名在本地完成，僅送出已簽名的交易
+      \item 使用者密碼經過Key Derivation Function（KDF）得到Derived Key
+      \item 使用Derived Key對私鑰進行對稱式加密後存入 Keystore JSON
     \end{itemize}
   \end{block}
 
   \begin{alertblock}{攻擊者為何竊取 \texttt{.ldb} / \texttt{.log} 檔案？}
-    這些檔案位於 Extension 的 Local Storage 目錄，可能包含加密後的 Vault 資料。若攻擊者取得這些檔案，可離線嘗試暴力破解使用者密碼以還原私鑰。
+    這些檔案位於 Extension 的 Local Storage 目錄，可能包含加密後的 Vault 資料。若攻擊者取得這些檔案，可離線嘗試暴力破解\textbf{使用者密碼}以還原私鑰。
   \end{alertblock}
 \end{frame}
 
@@ -355,49 +372,49 @@
 \section{第三階段：InvisibleFerret（四大 Modules）}
 % ============================================================
 
-\begin{frame}{InvisibleFerret — 概述與部署流程}
-  \begin{block}{Modular Python Backdoor，由四大模組組成}
+\begin{frame}{InvisibleFerret — 部署流程}
+  \begin{block}{InvisibleFerret Modules}
     \begin{enumerate}
-      \item \textbf{Main Module}（\texttt{.npl}）— Loader，負責下載與執行其他模組
-      \item \textbf{Payload Module}（\texttt{pay}）— TCP Backdoor、Keylogger、Clipboard Stealer
-      \item \textbf{Browser Module}（\texttt{bow}）— 竊取瀏覽器密碼與信用卡
-      \item \textbf{AnyDesk Module}（\texttt{adc}）— Persistence Remote Access
+      \item \textbf{Main Module}— Loader，負責下載與執行其他模組
+      \item \textbf{Payload Module}— TCP Backdoor、Keylogger、Clipboard Stealer
+      \item \textbf{Browser Module}— 竊取瀏覽器資料庫的所有密碼
+      \item \textbf{AnyDesk Module}— Persistence Remote Access
     \end{enumerate}
   \end{block}
 
-  \textbf{部署流程：}
+  \textbf{BeaverTail 取得 Main Module 的流程：}
   \begin{enumerate}
-    \item BeaverTail 從 C\&C 下載 \texttt{p2.zip}（獨立 Python 環境）
-    \item 從端點 \texttt{/client/<campaign\_ID>} 下載 Main 模組 \texttt{.npl}
-    \item 儲存於使用者家目錄，使用下載的 Python 環境執行
+    \item 從 C\&C 下載 \texttt{p2.zip}（獨立 Python 環境）
+    \item 從端點 \texttt{/client/<sType  >} 下載 Main Module
+    \item 將 Main Module儲存於使用者家目錄，用下載的 Python 環境執行
   \end{enumerate}
 
   \begin{alertblock}{Module Decryption 機制}
-    所有模組均以 \textbf{XOR Encryption + base64 Encoding}封裝，前 4 bytes 為 XOR Key，透過 \texttt{exec()} 執行
+    所有模組均以 \textbf{XOR Encryption + base64 Encoding}封裝，前 4 bytes 為 XOR Key%，透過 \texttt{exec()} 執行
   \end{alertblock}
 \end{frame}
 
-\begin{frame}{模組一：Main 模組（\texttt{.npl}）— sType 與 C\&C}
+\begin{frame}{模組一：Main 模組 — sType 與 C\&C}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{自動執行功能：}
+      \textbf{蒐集資訊：}
       \begin{itemize}
         \item System Fingerprinting（UUID、OS、PC Name、Username、System Version）
         \item 取得 Local IP 與 Public IP
-        % \item 透過 \texttt{ip-api.com} 取得 Geolocation
-        \item 上傳至 C\&C 的 \texttt{/keys} Endpoint
+        \item 透過 \texttt{ip-api.com} 取得地理位置
+        % \item 上傳至 C\&C 的 \texttt{/keys} Endpoint
       \end{itemize}
 
       \textbf{下載子模組：}
       \begin{itemize}
-        \item \texttt{/payload/<ID>} $\rightarrow$ \texttt{.n2/pay}
-        \item \texttt{/brow/<ID>} $\rightarrow$ \texttt{.n2/bow}（非 macOS）
+        \item \texttt{/payload/<sType>} $\rightarrow$ \texttt{.n2/pay}
+        \item \texttt{/brow/<sType>} $\rightarrow$ \texttt{.n2/bow}（非 macOS）
       \end{itemize}
 
-      C\&C 位址：
-      \begin{itemize}
-        \item 以 base64 Encoding 後拆成兩半並交換順序，增加 Decoding 難度
-      \end{itemize}
+      % C\&C 位址：
+      % \begin{itemize}
+      %   \item 以 base64 Encoding 後拆成兩半並交換順序，增加 Decoding 難度
+      % \end{itemize}
     \end{column}
     \begin{column}{0.46\textwidth}
       \begin{block}{sType 識別碼}
@@ -407,7 +424,7 @@
           \item 下載模組時附加於 URL 末端
           \item C\&C 伺服器將其寫入腳本
           \item 資料外傳時放入 POST 的 \texttt{type} 欄位
-          \item 例：\texttt{5Team9}、\texttt{7tEaM:}
+          % \item 例：\texttt{5Team9}、\texttt{7tEaM:}
         \end{itemize}
       \end{block}
       % \vspace{0.05cm}     
@@ -424,7 +441,7 @@
     \begin{itemize}
       \item 啟動後自動透過 HTTP POST 將 System Fingerprint 上傳至 C\&C 的 \texttt{/keys} 端點，依 C\&C 回應下載子模組（Payload / Browser / AnyDesk / Clipboard）
       \item \textbf{Payload Module 的 C\&C 位址可能與 Main Module 不同}，藉此將 Backdoor Traffic 與 Initial Deployment Traffic 分離，降低被偵測的風險
-      \item 所有 Client 與 C\&C 的通訊（除下載 Python 環境外）均帶有 Campaign ID，確保 Operator 可追蹤每位 Victim
+      \item 所有 Client 與 C\&C 的通訊（除下載 Python 環境外）均帶有 Campaign ID，用於追蹤每位 Victim
     \end{itemize}
   \end{block}
 \end{frame}
@@ -440,7 +457,7 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{模組二：Payload Module（\texttt{pay}）— Backdoor Commands}
+\begin{frame}{模組二：Payload Module — Backdoor Commands}
   \textbf{TCP Backdoor}（常用 port 1245，亦見 80、2245、3001、5000）
 
   \vspace{0.2cm}
@@ -465,7 +482,7 @@
   \begin{itemize}
     \item \textbf{Keylogger}：僅 Windows，使用 \texttt{pyWinHook}
     \item \textbf{Clipboard Stealer}：使用 \texttt{pyperclip} 監控內容變化
-    \item \textbf{FTP Exfiltration}：檔案以 XOR Encryption（Key \texttt{G01d\^{}6@(}），僅上傳 < 20MB
+    \item \textbf{FTP Exfiltration}：檔案以 XOR Encryption（Key: \texttt{G01d\^{}6@(}），僅上傳資料量小於20MB
   \end{itemize}
 \end{frame}
 
@@ -487,35 +504,37 @@
       \item 一種用於在網路上傳輸檔案的標準通訊協定（RFC 959）
       \item 採用 Client-Server 架構，Client 連線至 FTP Server 進行檔案上傳或下載
       \item 在本攻擊中，Payload Module 透過 FTP 將竊取的檔案（XOR Encrypted）上傳至攻擊者控制的 Server
-      \item 攻擊者選擇 FTP 而非 HTTP 的原因：適合大量檔案批次傳輸，且較不易被 Web Application Firewall 攔截
+      \item 攻擊者選擇 FTP 而非 HTTP 的原因：適合大量檔案批次傳輸，且較不易被 Web Application Firewall（WAF） 
+      \item WAF 部署在網際網路與應用程式之間，會攔截監控、篩選 HTTP/HTTPS 流量
     \end{itemize}
   \end{block}
 \end{frame}
 
-\begin{frame}{模組三：Browser Module（\texttt{bow}）— Browser Data Stealing}
+\begin{frame}{模組三：Browser Module — Browser Data Stealing}
   \textbf{Target Browsers：}Chrome、Brave、Opera、Yandex、Edge
 
-  \vspace{0.3cm}
-  \begin{block}{Stolen Data}
+  \vspace{0.1cm}
+  \begin{block}{目標 Data（以 Chrome 為例）}
     \begin{itemize}
-      \item \texttt{LoginData.db} — User Login Information（Credentials）
-      \item \texttt{webdata.db} — Saved Credit Card Information
+      \item \texttt{Login Data} — User Login Information（Credentials）
+      \item \texttt{Web Data} — Saved Credit Card Information
     \end{itemize}
+    這些資料經加密後儲存於本機 SQLite 資料庫，需先取得對應的 Decryption Key 才能還原明文。
   \end{block}
 
-  \vspace{0.3cm}
-  \textbf{AES Decryption Key 取得方式：}
+  \vspace{0.1cm}
+  \textbf{AES Decryption Key 取得方式（依作業系統）：}
   \begin{itemize}
-    \item \textbf{Windows：}從瀏覽器 \texttt{Local State} 檔案取得
-    \item \textbf{Linux：}透過 \texttt{secretstorage} Package 取得
-    \item \textbf{macOS：}透過 \texttt{security} Utility 取得
+    \item \textbf{Windows：}從 \texttt{Local State} 檔案取出，再透過 Windows Data Protection API (DPAPI) 解密
+    \item \textbf{Linux：}透過 python 套件\texttt{secretstorage}存取系統 Secret Service
+    \item \textbf{macOS：}使用\texttt{security}指令存取 Keychain
   \end{itemize}
 
-  \vspace{0.3cm}
-  資料透過 HTTP POST 上傳至 C\&C 的 \texttt{/keys} Endpoint
+  \vspace{0.1cm}
+  這些行為本來應該彈出授權詢問視窗確認是否存取，但由於Chrome通常已經被授權存取，因此可能不會出現詢問視窗
 \end{frame}
 
-\begin{frame}{模組四：AnyDesk Module（\texttt{adc}）— Persistence}
+\begin{frame}{模組四：AnyDesk Module — Persistence}
   \begin{alertblock}{Persistence Mechanism}
     利用合法 Remote Desktop 軟體 AnyDesk 建立 Persistent Backdoor
   \end{alertblock}
