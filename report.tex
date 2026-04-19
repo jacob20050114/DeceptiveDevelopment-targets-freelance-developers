@@ -574,7 +574,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{InvisibleFerret 模組化設計的優點}
+% \begin{frame}{InvisibleFerret 模組化設計的優點}
   % \begin{columns}[T]
   %   \begin{column}{0.48\textwidth}
   %     \begin{block}{降低被偵測風險}
@@ -595,23 +595,30 @@
   %     \end{block}
   %   \end{column}
   % \end{columns}
-  \begin{block}{彈性與維護性}
-    \begin{itemize}
-      \item 可單獨更新某模組而不重新部署整套
-      \item 若一個模組被偵測，其餘模組不會跟著暴露
-      \item C\&C 可依受害者環境決定下載哪些模組
-    \end{itemize}
-  \end{block}
-  \vspace{0.3cm}
-  我們推測後續合併為單一 Script 的原因是希望透過簡化模組設計、減少與 C\&C 溝通的次數，換取部署速度。
+%   \begin{block}{彈性與維護性}
+%     \begin{itemize}
+%       \item 可單獨更新某模組而不重新部署整套
+%       \item 若一個模組被偵測，其餘模組不會跟著暴露
+%       \item C\&C 可依受害者環境決定下載哪些模組
+%     \end{itemize}
+%   \end{block}
+%   \vspace{0.3cm}
+%   我們推測後續合併為單一 Script 的原因是希望透過簡化模組設計、減少與 C\&C 溝通的次數，換取部署速度。
 
-\end{frame}
+% \end{frame}
 
 % ============================================================
 \section{後續版本更新與演進}
 % ============================================================
 
 \begin{frame}{2024 年 8 月後版本更新（一）— 架構輕量化}
+  \begin{block}{模組化優點}
+    \begin{itemize}
+      \item 可單獨更新某模組而不重新部署整套
+      \item 若一個模組被偵測，其餘模組不會跟著暴露
+      \item C\&C 可依受害者環境決定下載哪些模組
+    \end{itemize}
+  \end{block}
   \begin{block}{架構變化}
     \begin{itemize}
       \item Trojanized Project裡僅嵌入 \textbf{Loader}，後續再從遠端下載實際 Payload
@@ -619,6 +626,8 @@
       \item 新增 gType 識別碼(目前功能未知)
     \end{itemize}
   \end{block}
+  我們推測後續合併為單一 Script 的原因是希望透過簡化模組設計、減少與 C\&C 溝通的次數，換取部署速度。
+
 \end{frame}
 
 \begin{frame}{2024 年 8 月後版本更新（二）— 新增功能}
