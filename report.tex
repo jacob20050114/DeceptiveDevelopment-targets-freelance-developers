@@ -76,41 +76,47 @@
 \section{攻擊鏈總覽}
 % ============================================================
 
-\begin{frame}{攻擊鏈總覽}
-  \begin{center}
-  \resizebox{\textwidth}{!}{
-  \begin{tikzpicture}[
-    node distance=0.6cm,
-    stage/.style={rectangle, rounded corners, draw=darkblue, fill=darkblue!10,
-                  text width=3.8cm, minimum height=1cm, align=center, font=\small\bfseries},
-    arrow/.style={-{Stealth[length=3mm]}, thick, darkblue}
-  ]
-    \node[stage] (s1) {1. 建立假身分\\接觸目標};
-    \node[stage, right=of s1] (s2) {2. Social Engineering\\提供 Trojanized 專案};
-    \node[stage, right=of s2] (s3) {3. BeaverTail\\第一階段 Malware};
-    \node[stage, below=of s1] (s4) {4. 下載 Python\\部署 InvisibleFerret};
-    \node[stage, below=of s2] (s5) {5. Payload 模組\\Backdoor 與 Keylogger};
-    \node[stage, below=of s3] (s6) {6. AnyDesk 模組\\Persistence};
-
-    \draw[arrow] (s1) -- (s2);
-    \draw[arrow] (s2) -- (s3);
-    \draw[arrow] (s3) -- (s4);
-    \draw[arrow] (s4) -- (s5);
-    \draw[arrow] (s5) -- (s6);
-  \end{tikzpicture}
-  }
-  \end{center}
-\end{frame}
-
-% \begin{frame}{攻擊鏈總覽（續）}
+% \begin{frame}{攻擊鏈總覽}
 %   \begin{center}
-%     \includegraphics[width=0.85\textwidth]{assets/figure6.png}
+%   \resizebox{\textwidth}{!}{
+%   \begin{tikzpicture}[
+%     node distance=0.6cm,
+%     stage/.style={rectangle, rounded corners, draw=darkblue, fill=darkblue!10,
+%                   text width=3.8cm, minimum height=1cm, align=center, font=\small\bfseries},
+%     arrow/.style={-{Stealth[length=3mm]}, thick, darkblue}
+%   ]
+%     \node[stage] (s1) {1. 建立假身分\\接觸目標};
+%     \node[stage, right=of s1] (s2) {2. Social Engineering\\提供 Trojanized 專案};
+%     \node[stage, right=of s2] (s3) {3. BeaverTail\\第一階段 Malware};
+%     \node[stage, below=of s3] (s4) {4. 下載 Python\\部署 InvisibleFerret};
+%     \node[stage, left=of s4] (s5) {5. Payload 模組\\Backdoor 與 Keylogger};
+%     \node[stage, left=of s5] (s6) {6. AnyDesk 模組\\Persistence};
+
+%     \draw[arrow] (s1) -- (s2);
+%     \draw[arrow] (s2) -- (s3);
+%     \draw[arrow] (s3) -- (s4);
+%     \draw[arrow] (s4) -- (s5);
+%     \draw[arrow] (s5) -- (s6);
+%   \end{tikzpicture}
+%   }
 %   \end{center}
 % \end{frame}
+
+\begin{frame}{攻擊鏈流程圖}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{assets/figure6-2.PNG}
+  \end{center}
+\end{frame}
 
 % ============================================================
 \section{第一階段：Social Engineering 與 Initial Access}
 % ============================================================
+
+\begin{frame}{聚焦流程圖}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{assets/01.PNG}
+  \end{center}
+\end{frame}
 
 \begin{frame}{Social Engineering（一）— 建立假 Recruiter 身分}
   \begin{columns}[T]
@@ -191,6 +197,12 @@
 % ============================================================
 \section{第二階段：BeaverTail Malware}
 % ============================================================
+
+\begin{frame}{聚焦流程圖}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{assets/02.PNG}
+  \end{center}
+\end{frame}
 
 \begin{frame}{BeaverTail — 第一階段 Infostealer / Downloader}
   \begin{columns}[T]
@@ -371,6 +383,12 @@
 % ============================================================
 \section{第三階段：InvisibleFerret（四大 Modules）}
 % ============================================================
+
+\begin{frame}{聚焦流程圖}
+  \begin{center}
+    \includegraphics[width=0.85\textwidth]{assets/03.PNG}
+  \end{center}
+\end{frame}
 
 \begin{frame}{InvisibleFerret — 部署流程}
   \begin{block}{InvisibleFerret Modules}
@@ -556,36 +574,61 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{InvisibleFerret 模組化設計的優點}
+  % \begin{columns}[T]
+  %   \begin{column}{0.48\textwidth}
+  %     \begin{block}{降低被偵測風險}
+  %       \begin{itemize}
+  %         \item Loader 體積極小，初始下載不觸發防毒
+  %         \item 各模組按需下載，減少磁碟上的惡意程式碼量
+  %         \item Browser Module 僅在 Windows 下載，避免不必要的流量
+  %       \end{itemize}
+  %     \end{block}
+  %   \end{column}
+  %   \begin{column}{0.48\textwidth}
+  %     \begin{block}{彈性與維護性}
+  %       \begin{itemize}
+  %         \item 可單獨更新某模組而不重新部署整套
+  %         \item 若一個模組被偵測，其餘模組不會跟著暴露
+  %         \item C\&C 可依受害者環境決定下載哪些模組
+  %       \end{itemize}
+  %     \end{block}
+  %   \end{column}
+  % \end{columns}
+  \begin{block}{彈性與維護性}
+    \begin{itemize}
+      \item 可單獨更新某模組而不重新部署整套
+      \item 若一個模組被偵測，其餘模組不會跟著暴露
+      \item C\&C 可依受害者環境決定下載哪些模組
+    \end{itemize}
+  \end{block}
+  \vspace{0.3cm}
+  我們推測後續合併為單一 Script 的原因是希望透過簡化模組設計、減少與 C\&C 溝通的次數，換取部署速度。
+
+\end{frame}
+
 % ============================================================
 \section{後續版本更新與演進}
 % ============================================================
 
-\begin{frame}{2024 年 8 月後版本更新（一）— 架構與識別碼}
+\begin{frame}{2024 年 8 月後版本更新（一）— 架構輕量化}
   \begin{block}{架構變化}
     \begin{itemize}
+      \item Trojanized Project裡僅嵌入 \textbf{Loader}，後續再從遠端下載實際 Payload
       \item InvisibleFerret 合併為\textbf{單一 Script}（不再分獨立模組）
-      \item 專案中的程式碼改為 \textbf{Loader}，從遠端下載實際 Payload
-    \end{itemize}
-  \end{block}
-
-  \begin{block}{新增 gType 識別碼}
-    \begin{itemize}
-      \item 在 \texttt{sType} 之外新增 \texttt{gType} 作為次要 victim/campaign 識別符
-      \item 下載模組 URL 格式變更為：\texttt{<C\&C\_IP>:<port>/<module>/<sType>/<gType>}
-      \item 引入 gType 前，sType 為 base64 字串（如 \texttt{5Team9}、\texttt{7tEaM:}）
-      \item 引入 gType 後，兩者多為純數字，不再使用 base64
+      \item 新增 gType 識別碼(目前功能未知)
     \end{itemize}
   \end{block}
 \end{frame}
 
 \begin{frame}{2024 年 8 月後版本更新（二）— 新增功能}
-  \begin{alertblock}{新增 ssh\_zcp 指令}
+  \begin{block}{新增 ssh\_zcp 指令}
     \begin{itemize}
       \item 可從 \textbf{88 個 Browser Extensions}中提取資料
       \item 竊取 Atomic、Exodus Cryptocurrency Wallet
       \item 竊取 1Password、Electrum、WinAuth、Proxifier4、Dashlane 等 Password Manager
     \end{itemize}
-  \end{alertblock}
+  \end{block}
 
   \begin{block}{Exfiltration via Telegram}
     使用 Telegram Bot API 將 ZIP/7z 檔案上傳至 Telegram Chat，同時傳至 FTP
@@ -606,7 +649,7 @@
   \textbf{演進趨勢：}
   \begin{itemize}
     \item 從廣泛監控 $\rightarrow$ Targeted Monitoring
-    \item Modular $\rightarrow$ Single Script $\rightarrow$ 再次 Modular（功能分離）
+    \item Modular $\rightarrow$ Single Script $\rightarrow$ 再次獨立出 Clipboard Stealer Module
     \item 持續擴大竊取範圍（88 個 Extensions + Password Managers）
   \end{itemize}
 \end{frame}
@@ -636,7 +679,7 @@
     \begin{itemize}
       \item \textbf{C\&C 通訊：}HTTP（port 1224 / 1244 / 80 / 3000）
       \item \textbf{Backdoor 通訊：}TCP Socket（port 1245 / 80 / 2245 / 3001 / 5000）
-      \item 前後段使用不同 C\&C IP 以分離可疑 Traffic
+      \item 前後段使用不同 C\&C IP 以分離可疑流量
     \end{itemize}
   \end{block}
 \end{frame}
@@ -690,14 +733,25 @@
   \end{block}
 \end{frame}
 
+
+\begin{frame}{後續操作}
+  \text{{\large 以下是我們認為後續可能發生的事}}
+  \begin{enumerate}
+    \item 像坐在受害者電腦前操作，繞過命令列限制
+    \item 等受害者解鎖 Crypto Wallet 後讀取記憶體中的私鑰
+    \item 存取受害者登入中的 Exchange 帳戶，直接轉移資產
+    \item 冒充受害者發送釣魚訊息
+    \item 部署額外 Malware
+  \end{enumerate}
+\end{frame}
+
 % ===== 結論 =====
 \begin{frame}{結論}
   \begin{itemize}
-    \item DeceptiveDevelopment 是一個\textbf{高度 Targeted}的攻擊活動
-    \item 結合 Social Engineering 與多階段 Malware，形成完整 Kill Chain
+    \item DeceptiveDevelopment 是一個高度面向\textbf{參與加密貨幣的自由接案者}的攻擊活動
     \item 持續演進更新，擴大竊取範圍與隱蔽性
-    \item 利用開發者對 Open Source 專案的信任作為 Initial Access Vector
-    \item 跨平台能力（Windows / Linux / macOS）擴大 Attack Surface
+    \item 利用受害者對自由接案平台的信任作為 Initial Access
+    \item 具有在不同系統入侵的能力（Windows / Linux / macOS）擴大可攻擊目標
   \end{itemize}
 
   \vspace{0.5cm}
@@ -705,5 +759,7 @@
     \large\textbf{謝謝聆聽}
   \end{center}
 \end{frame}
+
+
 
 \end{document}
